@@ -18,6 +18,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.cors.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
@@ -36,7 +37,11 @@ public class ConfiguracionSeguridad {
     @Bean
     CorsConfigurationSource fuenteCors(PropiedadesAplicacion p) {
         CorsConfiguration c = new CorsConfiguration();
-        c.setAllowedOrigins(p.getCors().getOrigenesPermitidos());
+        List<String> origenes = new ArrayList<>(p.getCors().getOrigenesPermitidos());
+        agregarSiFalta(origenes, "http://localhost:5173");
+        agregarSiFalta(origenes, "https://barberbookingappweb-6c514.web.app");
+        agregarSiFalta(origenes, "https://barberbookingappweb-6c514.firebaseapp.com");
+        c.setAllowedOrigins(origenes);
         c.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         c.setAllowedHeaders(List.of("Accept", "Content-Type", "X-XSRF-TOKEN", "Idempotency-Key"));
         c.setAllowCredentials(true);
@@ -44,6 +49,12 @@ public class ConfiguracionSeguridad {
         UrlBasedCorsConfigurationSource f = new UrlBasedCorsConfigurationSource();
         f.registerCorsConfiguration("/**", c);
         return f;
+    }
+
+    private static void agregarSiFalta(List<String> origenes, String origen) {
+        if (!origenes.contains(origen)) {
+            origenes.add(origen);
+        }
     }
 
     @Bean
