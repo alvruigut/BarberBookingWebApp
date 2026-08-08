@@ -35,7 +35,7 @@ public class ConfiguracionSeguridad {
     }
 
     @Bean
-    CorsConfigurationSource fuenteCors(PropiedadesAplicacion p) {
+    CorsConfigurationSource corsConfigurationSource(PropiedadesAplicacion p) {
         CorsConfiguration c = new CorsConfiguration();
         List<String> origenes = new ArrayList<>(p.getCors().getOrigenesPermitidos());
         agregarSiFalta(origenes, "http://localhost:5173");
@@ -59,14 +59,15 @@ public class ConfiguracionSeguridad {
 
     @Bean
     SecurityFilterChain cadena(HttpSecurity http, ObjectMapper json, FiltroUsuarioActivo filtroUsuarioActivo,
+            CorsConfigurationSource corsConfigurationSource,
             @Value("${server.servlet.session.cookie.same-site:lax}") String sameSite,
             @Value("${server.servlet.session.cookie.secure:false}") boolean cookieSegura)
             throws Exception {
         CookieCsrfTokenRepository csrf = CookieCsrfTokenRepository.withHttpOnlyFalse();
         csrf.setCookieName("XSRF-TOKEN");
         csrf.setCookieCustomizer(cookie -> cookie.sameSite(sameSite).secure(cookieSegura));
-        http.cors(c -> {
-        }).csrf(c -> c.csrfTokenRepository(csrf))
+        http.cors(c -> c.configurationSource(corsConfigurationSource))
+                .csrf(c -> c.csrfTokenRepository(csrf))
                 .authorizeHttpRequests(a -> a
                         .requestMatchers("/api/barberias/**", "/api/autenticacion/iniciar-sesion",
                                 "/api/autenticacion/csrf", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
