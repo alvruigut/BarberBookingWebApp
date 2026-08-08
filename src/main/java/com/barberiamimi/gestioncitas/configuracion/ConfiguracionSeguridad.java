@@ -15,6 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import com.barberiamimi.gestioncitas.seguridad.FiltroUsuarioActivo;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.cors.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,18 +38,22 @@ public class ConfiguracionSeguridad {
         CorsConfiguration c = new CorsConfiguration();
         c.setAllowedOrigins(p.getCors().getOrigenesPermitidos());
         c.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        c.setAllowedHeaders(List.of("Content-Type", "X-XSRF-TOKEN", "Idempotency-Key", "Turnstile-Token"));
+        c.setAllowedHeaders(List.of("Accept", "Content-Type", "X-XSRF-TOKEN", "Idempotency-Key"));
         c.setAllowCredentials(true);
+        c.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource f = new UrlBasedCorsConfigurationSource();
         f.registerCorsConfiguration("/**", c);
         return f;
     }
 
     @Bean
-    SecurityFilterChain cadena(HttpSecurity http, ObjectMapper json, FiltroUsuarioActivo filtroUsuarioActivo)
+    SecurityFilterChain cadena(HttpSecurity http, ObjectMapper json, FiltroUsuarioActivo filtroUsuarioActivo,
+            @Value("${server.servlet.session.cookie.same-site:lax}") String sameSite,
+            @Value("${server.servlet.session.cookie.secure:false}") boolean cookieSegura)
             throws Exception {
         CookieCsrfTokenRepository csrf = CookieCsrfTokenRepository.withHttpOnlyFalse();
         csrf.setCookieName("XSRF-TOKEN");
+        csrf.setCookieCustomizer(cookie -> cookie.sameSite(sameSite).secure(cookieSegura));
         http.cors(c -> {
         }).csrf(c -> c.csrfTokenRepository(csrf))
                 .authorizeHttpRequests(a -> a

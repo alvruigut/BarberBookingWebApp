@@ -64,5 +64,4 @@ aplicacion:
   privacidad:
     meses-conservacion-datos-clientes: 24
   cors:
-    # En Render: CORS_ORIGENES_PERMITIDOS=https://tu-proyecto.web.app,https://tu-proyecto.firebaseapp.com
-    origenes-permitidos: ${CORS_ORIGENES_PERMITIDOS:http://localhost:3000,http://localhost:5173}
+    origenes-permitidos: ${CORS_ORIGENES_PERMITIDOS:http://localhost:5173,https://barberbookingappweb-6c514.web.app,https://barberbookingappweb-6c514.firebaseapp.com}
