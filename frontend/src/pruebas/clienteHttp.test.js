@@ -39,14 +39,16 @@ describe('cliente HTTP', () => {
     expect(fetchSimulado).toHaveBeenCalledTimes(4);
   });
 
-  it('no reutiliza el token de Turnstile cuando la verificación antibot falla', async () => {
+  it('reintenta una escritura cuando recibe un 403', async () => {
     const fetchSimulado = vi.fn()
       .mockResolvedValueOnce(respuesta({ cabecera: 'X-XSRF-TOKEN', token: 'csrf' }))
-      .mockResolvedValueOnce(respuesta({ codigo: 'VERIFICACION_ANTIBOT_FALLIDA', mensaje: 'Verificación no válida' }, 403));
+      .mockResolvedValueOnce(respuesta({ codigo: 'CSRF_INVALIDO', mensaje: 'Token no válido' }, 403))
+      .mockResolvedValueOnce(respuesta({ cabecera: 'X-XSRF-TOKEN', token: 'csrf-renovado' }))
+      .mockResolvedValueOnce(respuesta({ id: 1 }, 201));
     vi.stubGlobal('fetch', fetchSimulado);
     const { peticion } = await import('../api/clienteHttp');
-    await expect(peticion('/api/barberias/mimi/citas', { method: 'POST', headers: { 'Turnstile-Token': 'token-usado' }, body: {} })).rejects.toMatchObject({ codigo: 'VERIFICACION_ANTIBOT_FALLIDA', estadoHttp: 403 });
-    expect(fetchSimulado).toHaveBeenCalledTimes(2);
+    await expect(peticion('/api/barberias/mimi/citas', { method: 'POST', body: {} })).resolves.toEqual({ id: 1 });
+    expect(fetchSimulado).toHaveBeenCalledTimes(4);
   });
 
   it('publica el evento de sesión caducada ante un 401', async () => {

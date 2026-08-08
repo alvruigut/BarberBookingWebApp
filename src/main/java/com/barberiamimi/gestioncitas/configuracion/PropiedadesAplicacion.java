@@ -54,12 +54,9 @@ public class PropiedadesAplicacion {
         public void setOrigenesPermitidos(List<String> valor) { origenesPermitidos = valor; }
     }
     public static class ReservasPublicas {
-        private String turnstileSecreto = "";
         private int maximoIntentos = 3;
         private int ventanaMinutos = 5;
         private int maximoCitasFuturasPorTelefono = 2;
-        public String getTurnstileSecreto() { return turnstileSecreto; }
-        public void setTurnstileSecreto(String valor) { turnstileSecreto = valor; }
         public int getMaximoIntentos() { return maximoIntentos; }
         public void setMaximoIntentos(int valor) { maximoIntentos = valor; }
         public int getVentanaMinutos() { return ventanaMinutos; }

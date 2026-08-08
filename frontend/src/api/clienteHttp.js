@@ -80,7 +80,7 @@ export async function peticion(ruta, opciones = {}, reintentoCsrf = false) {
     });
     if (!respuesta.ok) {
       const error = await interpretarError(respuesta);
-      if (respuesta.status === 403 && escritura && !reintentoCsrf && error.codigo !== 'VERIFICACION_ANTIBOT_FALLIDA') {
+      if (respuesta.status === 403 && escritura && !reintentoCsrf) {
         limpiarCsrf();
         return peticion(ruta, opciones, true);
       }

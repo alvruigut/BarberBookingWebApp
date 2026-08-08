@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 public interface RepositorioBarberia extends JpaRepository<Barberia, Long> {
+    Optional<Barberia> findBySlug(String slug);
     Optional<Barberia> findBySlugAndActivaTrue(String slug);
     List<Barberia> findByActivaTrueOrderByNombre();
     @Lock(LockModeType.PESSIMISTIC_WRITE)

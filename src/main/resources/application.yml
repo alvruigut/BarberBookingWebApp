@@ -23,6 +23,11 @@ spring:
         format_sql: true
         jdbc:
           time_zone: Europe/Madrid
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: 0
   jackson:
     default-property-inclusion: non_null
   session:
@@ -36,7 +41,8 @@ server:
     session:
       cookie:
         http-only: true
-        same-site: lax
+        # Firebase y Render son sitios distintos: usa COOKIE_SAME_SITE=none y COOKIE_SEGURA=true.
+        same-site: ${COOKIE_SAME_SITE:lax}
         secure: ${COOKIE_SEGURA:false}
 springdoc:
   swagger-ui:
@@ -52,12 +58,11 @@ aplicacion:
     maximo-intentos: 5
     bloqueo-minutos: 15
   reservas-publicas:
-    turnstile-secreto: ${TURNSTILE_SECRET_KEY:}
     maximo-intentos: 3
     ventana-minutos: 5
     maximo-citas-futuras-por-telefono: 2
   privacidad:
     meses-conservacion-datos-clientes: 24
   cors:
-    origenes-permitidos:
-      - http://localhost:3000
+    # En Render: CORS_ORIGENES_PERMITIDOS=https://tu-proyecto.web.app,https://tu-proyecto.firebaseapp.com
+    origenes-permitidos: ${CORS_ORIGENES_PERMITIDOS:http://localhost:3000,http://localhost:5173}
